@@ -8,6 +8,7 @@ class User(db.Model):
     username = db.Column(db.String(), nullable=False, unique=True)
     password = db.Column(db.String(), nullable=False)
     salt = db.Column(db.String(), nullable=False)
+    money = db.Column(db.Integer, nullable=False)
 
 
 class Book(db.Model):
