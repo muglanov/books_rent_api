@@ -1,31 +1,19 @@
 # coding: utf-8
 
-from sqlalchemy import *
+import psycopg2
+from hashlib import sha1
+from random import random
 
-engine = create_engine('postgresql://postgres:12345678@localhost/books_rent')
-metadata = MetaData()
 
-user = Table('user', metadata,
-    Column('user', Integer, primary_key=True),
-    Column('username', String(), nullable=False, unique=True),
-    Column('password', String(), nullable=False),
-    Column('salt', String(), nullable=False),
-    Column('money', Integer, nullable=False)
-)
+def insert_user_query(username, password, money):
+    salt = sha1(str(random()).encode()).hexdigest()
+    prepeared_pwd = '{}{}'.format(salt, password)
+    salted_pwd = sha1(prepeared_pwd.encode()).hexdigest()
+    return '''INSERT INTO user 
+    (username, password, salt, money) VALUES 
+    ({}, {}, {}, {})
+    '''.format(username, salted_pwd, salt, money)
 
-book = Table('book', metadata,
-    Column('book', Integer, primary_key=True),
-    Column('author', String(), nullable=False),
-    Column('name', String(), nullable=False, unique=True),
-    Column('rent_price', Integer, nullable=False)
-)
-
-rent = Table('rent', metadata,
-    Column('rent', Integer, primary_key=True),
-    Column('user', Integer, ForeignKey('user.user'), nullable=False),
-    Column('book', Integer, ForeignKey('book.book'), nullable=False),
-    Column('dt', Date, nullable=False),
-    Column('rental_dt', Date, nullable=False)
-)
-
-metadata.create_all(engine)
+with psycopg2.connect('dbname="books_rent" user="postgres" host="localhost" password="12345678"') as conn:
+    cur = conn.cursor()
+    cur.execute(insert_user_query('Василий', '123456', 7500))
