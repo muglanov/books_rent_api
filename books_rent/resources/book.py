@@ -14,7 +14,7 @@ class Book(Resource):
             result.append({
                 'book': book.book,
                 'author': book.author,
-                'name': 'Harry Potter',
+                'name': book.name,
                 'rent_price': book.rent_price
             })
         return result
