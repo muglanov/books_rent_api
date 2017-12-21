@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from hashlib import sha1
+
 from flask_restful import Resource, request
 
 from books_rent import authorized_users
@@ -18,18 +20,26 @@ class UserSignIn(Resource):
         if not user:
             return {'status': False, 'error': 'User with this username'}, 401
         salt = user.salt
-        salted_pwd = '{}{}'.format(salt, password)
+        prepeared_pwd = '{}{}'.format(salt, password)
+        salted_pwd = sha1(prepeared_pwd.encode()).hexdigest()
         if salted_pwd != user.password:
             return {'status': False, 'error': 'User with this username and password not exist'}, 401
         token = unique_token()
-        authorized_users[token] = user
+        authorized_users[username] = token
         return {'status': True, 'token': token, 'error': None}
 
 
 class UserSignOut(Resource):
 
     def get(self):
+        username = request.args.get('username')
         token = request.args.get('token')
-        if token and authorized_users.get(token):
-            del authorized_users[token]
+        if username is None:
+            return {'status': False, 'error': 'Username is none'}
+        if token is None:
+            return {'status': False, 'error': 'Token is none'}
+        logined_token = authorized_users.get(username)
+        if logined_token is None or logined_token != token:
+            return {'status': False, 'error': 'User is not authorized or session is outdated'}
+        del authorized_users[username]
         return {'status': True, 'error': None}
