@@ -17,6 +17,8 @@ class Book(Resource):
         if token is None:
             return {'status': False, 'error': 'Token is none'}
         user = UserModel.query.filter_by(username=username).first()
+        if user is None:
+            return {'status': False, 'error': 'No user with username'}
         if user.token is None or user.token != token:
             return {'status': False, 'error': 'User is not authorized or session is outdated'}
         books = BookModel.query.all()
