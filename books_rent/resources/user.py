@@ -5,7 +5,7 @@ from json import loads
 
 from flask_restful import Resource, request
 
-from books_rent import authorized_users
+from books_rent import db
 from books_rent.models import User as UserModel
 from books_rent.utils import unique_token
 
@@ -27,7 +27,8 @@ class UserSignIn(Resource):
         if salted_pwd != user.password:
             return {'status': False, 'error': 'User with this username and password not exist'}, 401
         token = unique_token()
-        authorized_users[username] = token
+        user.token = token
+        db.session.commit()
         return {'status': True, 'token': token, 'error': None}
 
 
@@ -40,8 +41,9 @@ class UserSignOut(Resource):
             return {'status': False, 'error': 'Username is none'}
         if token is None:
             return {'status': False, 'error': 'Token is none'}
-        logined_token = authorized_users.get(username)
-        if logined_token is None or logined_token != token:
+        user = UserModel.query.filter_by(username=username).first()
+        if user.token is None or user.token != token:
             return {'status': False, 'error': 'User is not authorized or session is outdated'}
-        del authorized_users[username]
+        user.token = None
+        db.session.commit()
         return {'status': True, 'error': None}
