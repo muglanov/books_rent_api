@@ -23,9 +23,9 @@ class Book(db.Model):
 
 class Rent(db.Model):
     __tablename__ = 'rent'
+    __table_args__ = (db.UniqueConstraint('user', 'book', name='_user_book_uc'),)
 
     rent = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user = db.Column(db.Integer, db.ForeignKey('user.user'), nullable=False)
     book = db.Column(db.Integer, db.ForeignKey('book.book'), nullable=False)
-    dt = db.Column(db.Date, nullable=False)
-    rental_dt = db.Column(db.Date, nullable=False)
+    rental_end_dt = db.Column(db.Date, nullable=False)
