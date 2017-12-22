@@ -1,22 +1,23 @@
 # coding: utf-8
 
+from json import loads
+
 from flask_restful import Resource, request
 
-from books_rent import authorized_users
-from books_rent.models import Book as BookModel
+from books_rent.models import Book as BookModel, User as UserModel
 
 
 class Book(Resource):
 
     def get(self):
-        username = request.args.get('username')
+        username = loads(request.data).get('username')
         token = request.headers.get('token')
         if username is None:
             return {'status': False, 'error': 'Username is none'}
         if token is None:
             return {'status': False, 'error': 'Token is none'}
-        logined_token = authorized_users.get(username)
-        if logined_token is None or logined_token != token:
+        user = UserModel.query.filter_by(username=username).first()
+        if user.token is None or user.token != token:
             return {'status': False, 'error': 'User is not authorized or session is outdated'}
         books = BookModel.query.all()
         result = []
