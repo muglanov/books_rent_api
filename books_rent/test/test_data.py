@@ -57,6 +57,8 @@ def fill_test_data():
     with psycopg2.connect('dbname=postgres user=postgres host=localhost password=12345678') as conn:
         cur = conn.cursor()
 
+        cur.execute('DELETE FROM public.rent;')
+
         # создание тестовых пользователей
         cur.execute('DELETE FROM public.user;')
         for user in test_users:
