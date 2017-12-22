@@ -54,7 +54,7 @@ def insert_book_query(name, author, rent_price):
 
 
 def fill_test_data():
-    with psycopg2.connect('dbname=books_rent user=postgres host=localhost password=12345678') as conn:
+    with psycopg2.connect('dbname=postgres user=postgres host=localhost password=12345678') as conn:
         cur = conn.cursor()
 
         # создание тестовых пользователей
@@ -67,3 +67,6 @@ def fill_test_data():
         for book in test_books:
             cur.execute(insert_book_query(book['name'], book['author'], book['rent_price']))
 
+
+if __name__ == '__main__':
+    fill_test_data()

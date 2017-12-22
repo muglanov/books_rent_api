@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from hashlib import sha1
+from json import loads
 
 from flask_restful import Resource, request
 
@@ -11,9 +12,10 @@ from books_rent.utils import unique_token
 
 class UserSignIn(Resource):
 
-    def get(self):
-        username = request.args.get('username')
-        password = request.args.get('password')
+    def post(self):
+        data = loads(request.data)
+        username = data.get('username')
+        password = data.get('password')
         if username is None or password is None:
             return {'status': False, 'error': 'Username or password is none'}, 401
         user = UserModel.query.filter_by(username=username).first()
@@ -31,9 +33,9 @@ class UserSignIn(Resource):
 
 class UserSignOut(Resource):
 
-    def get(self):
-        username = request.args.get('username')
-        token = request.args.get('token')
+    def delete(self):
+        username = loads(request.data).get('username')
+        token = request.headers.get('token')
         if username is None:
             return {'status': False, 'error': 'Username is none'}
         if token is None:

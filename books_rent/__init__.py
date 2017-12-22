@@ -7,7 +7,7 @@ from books_rent.utils import get_postgresql_db_uri
 
 username = "postgres"
 pwd = "12345678"
-db_name = 'books_rent'
+db_name = 'postgres'
 authorized_users = {}
 
 app = Flask(__name__)

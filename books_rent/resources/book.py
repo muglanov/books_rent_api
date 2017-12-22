@@ -10,7 +10,7 @@ class Book(Resource):
 
     def get(self):
         username = request.args.get('username')
-        token = request.args.get('token')
+        token = request.headers.get('token')
         if username is None:
             return {'status': False, 'error': 'Username is none'}
         if token is None:
