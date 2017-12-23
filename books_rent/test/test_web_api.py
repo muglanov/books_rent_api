@@ -95,9 +95,9 @@ class TestFlaskApi(TestCase):
             resp_content = loads(response.data.decode())
             self.assertTrue(resp_content['status'])
 
-            # response = self.web_api.post('/rent', data=data, headers=header, content_type='plain-text/json')
-            # resp_content = loads(response.data.decode())
-            # self.assertFalse(resp_content['status'])
+            response = self.web_api.post('/rent', data=data, headers=header, content_type='plain-text/json')
+            resp_content = loads(response.data.decode())
+            self.assertFalse(resp_content['status'])
 
             data = dumps({'username': user['username']})
             response = self.web_api.get('/rent', data=data, headers=header, content_type='plain-text/json')
