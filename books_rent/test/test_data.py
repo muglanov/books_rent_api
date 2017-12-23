@@ -27,12 +27,12 @@ test_books = [
 
 test_users = [
     {'username': 'mavrik', 'password': 'qwerty12345', 'money': 10000},
-    {'username': 'capture', 'password': 'qazwsxedc', 'money': 1570},
-    {'username': 'mumu', 'password': 'plmokn', 'money': 410},
+    {'username': 'capture', 'password': 'qazwsxedc', 'money': 2570},
+    {'username': 'mumu', 'password': 'plmokn', 'money': 6100},
     {'username': 'nikolay', 'password': 'zxc123asd', 'money': 3500},
     {'username': 'kazan', 'password': 'belykrolik123', 'money': 5333},
     {'username': 'logan123', 'password': 'superxmen123', 'money': 7000},
-    {'username': 'argentinoff', 'password': 'yamaika50', 'money': 10000}
+    {'username': 'argentinoff', 'password': 'yamaika50', 'money': 8000}
 ]
 
 

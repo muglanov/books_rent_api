@@ -22,10 +22,13 @@ class TestFlaskApi(TestCase):
 
     def test_authorizing(self):
         for user in test_users:
+            # авторизация пользователя
             data = dumps(dict(username=user['username'], password=user['password']))
             response = self.web_api.post('/sign-in', data=data, content_type='plain-text/json')
             resp_content = loads(response.data.decode())
             self.assertTrue(resp_content['status'])
+
+            # выход пользователя
             data = dumps({'username': user['username']})
             header = {'token': resp_content['token']}
             response = self.web_api.delete('/sign-out', data=data, content_type='plain-text/json',
@@ -35,7 +38,7 @@ class TestFlaskApi(TestCase):
 
     def test_get_books(self):
         # авторизация пользователя
-        user = dict(username='mavrik', password= 'qwerty12345')
+        user = test_users[0]
         data = dumps(user)
         response = self.web_api.post('/sign-in', data=data)
         resp_content = loads(response.data.decode())
@@ -48,6 +51,10 @@ class TestFlaskApi(TestCase):
         response = self.web_api.get('/book', data=data, headers=header, content_type='plain-text/json')
         books = loads(response.data.decode())['books_list']
         self.assertEqual(len(books), len(test_books))
+        for book in books:
+            del book['book']
+        for book in test_books:
+            self.assertTrue(book in books)
 
         # выход пользователя
         data = dumps({'username': user['username']})
@@ -62,44 +69,42 @@ class TestFlaskApi(TestCase):
         status = loads(response.data.decode())['status']
         self.assertFalse(status)
 
-    def test_add_new_rent(self):
-        # авторизация пользователя
-        user = dict(username='mavrik', password='qwerty12345')
-        data = dumps(user)
-        response = self.web_api.post('/sign-in', data=data, content_type='plain-text/json')
-        resp_content = loads(response.data.decode())
-        self.assertTrue(resp_content['status'])
+    def test_rent_resource(self):
+        for i in range(len(test_users)):
+            # авторизация пользователя
+            user = test_users[i]
+            data = dumps(user)
+            response = self.web_api.post('/sign-in', data=data, content_type='plain-text/json')
+            resp_content = loads(response.data.decode())
+            self.assertTrue(resp_content['status'])
 
-        # запрос списка с валидным токеном
-        user['token'] = resp_content['token']
-        data = dumps({'username': user['username']})
-        header = {'token': user['token']}
-        response = self.web_api.get('/book', data=data, headers=header, content_type='plain-text/json')
-        resp_content = loads(response.data.decode())
-        self.assertTrue(resp_content['status'])
-        books = resp_content.get('books_list')
-        self.assertEqual(len(books), len(test_books))
+            # запрос списка с валидным токеном
+            user['token'] = resp_content['token']
+            data = dumps({'username': user['username']})
+            header = {'token': user['token']}
+            response = self.web_api.get('/book', data=data, headers=header, content_type='plain-text/json')
+            resp_content = loads(response.data.decode())
+            self.assertTrue(resp_content['status'])
+            books = resp_content.get('books_list')
+            self.assertEqual(len(books), len(test_books))
 
-        # добавление аренды
-        book = books.pop()
-        data = dumps(dict(username='mavrik', book_id=book['book'], month_count=randint(1, 6)))
-        response = self.web_api.post('/rent', data=data, headers=header,content_type='plain-text/json')
-        resp_content = loads(response.data.decode())
-        self.assertTrue(resp_content['status'])
+            # добавление аренды
+            book = books[randint(0, len(books) - 1)]
+            data = dumps(dict(username=user['username'], book_id=book['book'], month_count=randint(1, 3)))
+            response = self.web_api.post('/rent', data=data, headers=header,content_type='plain-text/json')
+            resp_content = loads(response.data.decode())
+            self.assertTrue(resp_content['status'])
 
-        response = self.web_api.post('/rent', data=data, headers=header, content_type='plain-text/json')
-        resp_content = loads(response.data.decode())
-        self.assertFalse(resp_content['status'])
+            # response = self.web_api.post('/rent', data=data, headers=header, content_type='plain-text/json')
+            # resp_content = loads(response.data.decode())
+            # self.assertFalse(resp_content['status'])
 
-        # выход пользователя
-        data = dumps({'username': user['username']})
-        response = self.web_api.delete('/sign-out', data=data, headers=header, content_type='plain-text/json')
-        resp_content = loads(response.data.decode())
-        self.assertTrue(resp_content['status'])
+            data = dumps({'username': user['username']})
+            response = self.web_api.get('/rent', data=data, headers=header, content_type='plain-text/json')
+            resp_content = loads(response.data.decode())
+            self.assertTrue(resp_content['status'])
 
-    # def test_rented_books_for_user(self):
-    #     data = {'username': 'mavrik'}
-    #     header = {'token': 'sample-token'}
-    #     response = self.web_api.get('/rent', data=dumps(data), content_type='plain-text/json', headers=header)
-    #     resp_content = loads(response.data.decode())
-    #     self.assertTrue(resp_content['status'])
+            # выход пользователя
+            response = self.web_api.delete('/sign-out', data=data, headers=header, content_type='plain-text/json')
+            resp_content = loads(response.data.decode())
+            self.assertTrue(resp_content['status'])
