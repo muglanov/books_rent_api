@@ -1,32 +1,40 @@
 # coding: utf-8
 
 from json import loads
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 
 from flask_restful import Resource, request
 
-from books_rent import authorized_users, db
+from books_rent import db
 from books_rent.models import Rent as RentModel, Book as BookModel, User as UserModel
 
 
 class Rent(Resource):
 
     def get(self):
-        # username = loads(request.data).get('username')
-        # token = request.headers.get('token')
-        # if username is None:
-        #     return {'status': False, 'error': 'Username is none'}
-        # if token is None:
-        #     return {'status': False, 'error': 'Token is none'}
-        # user = UserModel.query.filter_by(username=username).first()
-        # if user.token is None or user.token != token:
-        #     return {'status': False, 'error': 'User is not authorized or session is outdated'}
-        # user_rents = RentModel.query.filter_by(username=username).all()
-        elems = db.session.query(RentModel, BookModel, UserModel).all()
-        result = {}
-        # for rent in user_rents:
-
-        return {'status': True, 'error': None}
+        username = loads(request.data).get('username')
+        token = request.headers.get('token')
+        if username is None:
+            return {'status': False, 'error': 'Username is none'}
+        if token is None:
+            return {'status': False, 'error': 'Token is none'}
+        user = UserModel.query.filter_by(username=username).first()
+        if user is None:
+            return {'status': False, 'error': 'No user with username'}
+        if user.token is None or user.token != token:
+            return {'status': False, 'error': 'User is not authorized or session is outdated'}
+        user_rents = RentModel.query.filter_by(user=user.user).all()
+        result = []
+        for user_rent in user_rents:
+            if user_rent.rental_end_dt <= date.today():
+                db.session.delete(user_rent)
+            else:
+                result.append({
+                    'name': user_rent.book_row.name,
+                    'author': user_rent.book_row.author,
+                    'rental_end_dt': user_rent.rental_end_dt.isoformat()
+                })
+        return {'status': True, 'error': None, 'rented_books_list': result}
 
     def post(self):
         data = loads(request.data)

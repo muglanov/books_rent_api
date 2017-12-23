@@ -29,3 +29,6 @@ class Rent(db.Model):
     user = db.Column(db.Integer, db.ForeignKey('user.user'), nullable=False)
     book = db.Column(db.Integer, db.ForeignKey('book.book'), nullable=False)
     rental_end_dt = db.Column(db.Date, nullable=False)
+
+    user_row = db.relation(User)
+    book_row = db.relation(Book)
