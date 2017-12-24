@@ -10,12 +10,12 @@ from books_rent.models import Book as BookModel, User as UserModel
 class Book(Resource):
 
     def get(self):
+        if not request.data:
+            return {'status': False, 'error': 'Not request data'}
         username = loads(request.data).get('username')
         token = request.headers.get('token')
-        if username is None:
-            return {'status': False, 'error': 'Username is none'}
-        if token is None:
-            return {'status': False, 'error': 'Token is none'}
+        if username is None or token is None:
+            return {'status': False, 'error': 'Username or token is none'}
         user = UserModel.query.filter_by(username=username).first()
         if user is None:
             return {'status': False, 'error': 'No user with username'}

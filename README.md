@@ -8,7 +8,7 @@
 -Flask_SQLAlchemy-2.3.2
 -psycopg2
 
-Сервер баз данных
+Сервер баз данных (для разработки использовался postgresql 10)
 -postgresql
 
 пользователь базы данных postgres
