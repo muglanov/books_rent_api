@@ -9,5 +9,16 @@
 -psycopg2
 
 Сервер баз данных
--postgresql-9.5
+-postgresql
 
+пользователь базы данных postgres
+пароль '12345678'
+база данных postgres
+
+для запуска web api необходимо запустить скрипт:
+в директории books_rent_api/books_rent/
+python3 run_api.py
+
+для запуска тестирования необходимо запустить скрипт:
+в директории books_rent_api/books_rent/test/
+python3 test_web_api.py

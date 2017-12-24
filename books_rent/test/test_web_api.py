@@ -108,3 +108,6 @@ class TestFlaskApi(TestCase):
             response = self.web_api.delete('/sign-out', data=data, headers=header, content_type='plain-text/json')
             resp_content = loads(response.data.decode())
             self.assertTrue(resp_content['status'])
+
+if __name__ == '__main__':
+    main()
